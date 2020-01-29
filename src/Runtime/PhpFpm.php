@@ -317,6 +317,17 @@ final class PhpFpm
             return '';
         }
 
+        $queryStringParameters = [];
+
+        foreach ($event['queryStringParameters'] as $key => $value) {
+            \parse_str("{$key}={$value}", $params);
+
+            $queryStringParameters = \array_merge_recursive(
+                $queryStringParameters,
+                $params
+            );
+        }
+
         /*
          * Watch out in the future if using $event['queryStringParameters'] directly!
          *
@@ -327,7 +338,7 @@ final class PhpFpm
          * ?array[key]=value gives ['array[key]' => 'value'] while we want ['array' => ['key' = > 'value']]
          * In that case we should recreate the original query string and use parse_str which handles correctly arrays
          */
-        return http_build_query($event['queryStringParameters']);
+        return http_build_query($queryStringParameters);
     }
 
     /**
